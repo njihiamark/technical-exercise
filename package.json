@@ -8,9 +8,12 @@
   ],
   "private": true,
   "dependencies": {
+    "axios": "^0.20.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
-    "react-scripts": "3.4.3"
+    "react-scripts": "3.4.3",
+    "semantic-ui-css": "^2.4.1",
+    "semantic-ui-react": "^1.2.1"
   },
   "devDependencies": {
     "node-sass": "^4.0.0",
