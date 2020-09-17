@@ -1,6 +1,8 @@
 import React from "react";
 import { Card, Image } from "semantic-ui-react";
 
+//I used cards instead of tables because 
+//I will not have to create multiple layouts for responsive
 const Users = ({ data }) => (
   <Card.Group>
     {data.map((user) => (

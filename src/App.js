@@ -3,6 +3,7 @@ import "semantic-ui-css/semantic.min.css";
 import "./App.css";
 import Users from "./components/Users";
 import Axios from "axios";
+import UserSummary from "./components/UserSummary";
 
 function App() {
   const [users, setUsers] = useState([]);
@@ -34,6 +35,7 @@ function App() {
 
   return (
     <div className="Main">
+      <UserSummary />
       <Users data={users}/ >
     </div>
   );
