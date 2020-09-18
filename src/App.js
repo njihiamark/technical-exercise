@@ -85,20 +85,23 @@ function App() {
     setCalculatingTeamMemberNos(false);
   };
 
-  const handleDateSort = () =>{
-    if(sortDateNext === "desc"){
+  const handleDateSort = () => {
+    if (sortDateNext === "desc") {
       setSortDateNext("asc");
       setUsers(dateSort(users, "asc"));
-    }else{
+    } else {
       setSortDateNext("desc");
       setUsers(dateSort(users, "desc"));
     }
-  }
+  };
 
   const SortButton = () => (
-    <Button color="blue" className="mb-1e" onClick={handleDateSort}>
-      Sort by {sortDateNext === "desc" ? "oldest" : "latest"}
-    </Button>
+    <div className="mb-1e">
+      <Button color="blue" onClick={handleDateSort}>
+        Sort by{" "}
+        {sortDateNext === "desc" ? "date added(oldest)" : "date added(newest)"}
+      </Button>
+    </div>
   );
 
   return (
