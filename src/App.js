@@ -16,6 +16,10 @@ function App() {
     calculatingPublishedCampaigns,
     setCalculatingPublishedCampaigns,
   ] = useState(true);
+  const [teamMemberNos, setTeamMemberNos] = useState(0);
+  const [calculatingTeamMemberNos, setCalculatingTeamMemberNos] = useState(
+    true
+  );
 
   useEffect(() => {
     (async () => {
@@ -28,15 +32,60 @@ function App() {
         return d - c;
       });
 
-      setLastUserAddedAt(newest[0].name);
-      setUsers(newest);
+      //we've finished fetchind data
+      setUsersLoading(false);
+
+      calculateMembers(newest);
+      calculateInvites(newest);
+      calculateCampaigns(newest);
+
+      //update these states only when there is data received
+      if (newest.length > 0) {
+        setLastUserAddedAt(newest[0].name);
+        setUsers(newest);
+      }
     })();
   }, []);
 
+  const calculateInvites = async (data) => {
+    let copyUsers = data.slice();
+    let sum = await copyUsers.reduce((sum, cur ) => sum + cur.stats.invited_users_count , 0);
+    setTotalUsersInvited(sum);
+    setCalculatingInvitedUsers(false);
+  };
+
+  const calculateCampaigns = async (data) => {
+    let copyUsers = data.slice();
+    let sum = await copyUsers.reduce((sum, cur ) => sum + cur.stats.published_campaigns_count , 0);
+    setTotalPublishedCampaigns(sum);
+    setCalculatingPublishedCampaigns(false);
+  };
+
+  const calculateMembers = async (data) => {
+    let copyUsers = data.slice();
+    let teamMembers = await copyUsers.filter((user) => user.style === "member");
+    setTeamMemberNos(teamMembers.length);
+    setCalculatingTeamMemberNos(false);
+  };
+
   return (
     <div className="Main">
-      <UserSummary />
-      <Users data={users}/ >
+      {users.length >= 0 && !usersLoading ? (
+        <div>
+          <UserSummary
+            last_user={lastUserAddedAt}
+            calculatingMembers={calculatingTeamMemberNos}
+            membersNos={teamMemberNos}
+            invites={totalUsersInvited}
+            calculatingInvites= {calculatingInvitedUsers}
+            campaigns = {totalPublishedCampaigns}
+            calculatingCampaigns = {calculatingPublishedCampaigns}
+          />
+          <Users data={users} />
+        </div>
+      ) : (
+        <p>loading...</p>
+      )}
     </div>
   );
 }
