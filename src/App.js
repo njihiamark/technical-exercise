@@ -4,6 +4,7 @@ import "./App.css";
 import Users from "./components/Users";
 import Axios from "axios";
 import UserSummary from "./components/UserSummary";
+import { Button } from "semantic-ui-react";
 
 function App() {
   const [users, setUsers] = useState([]);
@@ -20,17 +21,14 @@ function App() {
   const [calculatingTeamMemberNos, setCalculatingTeamMemberNos] = useState(
     true
   );
+  const [sortDateNext, setSortDateNext] = useState("desc");
 
   useEffect(() => {
     (async () => {
       //fetch data
       const result = await Axios("http://localhost:3000/example_data.json");
       //sort data by created_at newest first
-      const newest = await result.data.slice().sort((a, b) => {
-        let c = new Date(a.created_at);
-        let d = new Date(b.created_at);
-        return d - c;
-      });
+      const newest = await dateSort(result.data, "desc");
 
       //we've finished fetchind data
       setUsersLoading(false);
@@ -47,16 +45,35 @@ function App() {
     })();
   }, []);
 
+  const dateSort = (data, order) => {
+    let sorted = data.slice().sort((a, b) => {
+      let c = new Date(a.created_at);
+      let d = new Date(b.created_at);
+      if (order === "desc") {
+        return d - c;
+      } else {
+        return c - d;
+      }
+    });
+    return sorted;
+  };
+
   const calculateInvites = async (data) => {
     let copyUsers = data.slice();
-    let sum = await copyUsers.reduce((sum, cur ) => sum + cur.stats.invited_users_count , 0);
+    let sum = await copyUsers.reduce(
+      (sum, cur) => sum + cur.stats.invited_users_count,
+      0
+    );
     setTotalUsersInvited(sum);
     setCalculatingInvitedUsers(false);
   };
 
   const calculateCampaigns = async (data) => {
     let copyUsers = data.slice();
-    let sum = await copyUsers.reduce((sum, cur ) => sum + cur.stats.published_campaigns_count , 0);
+    let sum = await copyUsers.reduce(
+      (sum, cur) => sum + cur.stats.published_campaigns_count,
+      0
+    );
     setTotalPublishedCampaigns(sum);
     setCalculatingPublishedCampaigns(false);
   };
@@ -68,6 +85,22 @@ function App() {
     setCalculatingTeamMemberNos(false);
   };
 
+  const handleDateSort = () =>{
+    if(sortDateNext === "desc"){
+      setSortDateNext("asc");
+      setUsers(dateSort(users, "asc"));
+    }else{
+      setSortDateNext("desc");
+      setUsers(dateSort(users, "desc"));
+    }
+  }
+
+  const SortButton = () => (
+    <Button color="blue" className="mb-1e" onClick={handleDateSort}>
+      Sort by {sortDateNext === "desc" ? "oldest" : "latest"}
+    </Button>
+  );
+
   return (
     <div className="Main">
       {users.length >= 0 && !usersLoading ? (
@@ -77,10 +110,11 @@ function App() {
             calculatingMembers={calculatingTeamMemberNos}
             membersNos={teamMemberNos}
             invites={totalUsersInvited}
-            calculatingInvites= {calculatingInvitedUsers}
-            campaigns = {totalPublishedCampaigns}
-            calculatingCampaigns = {calculatingPublishedCampaigns}
+            calculatingInvites={calculatingInvitedUsers}
+            campaigns={totalPublishedCampaigns}
+            calculatingCampaigns={calculatingPublishedCampaigns}
           />
+          <SortButton />
           <Users data={users} />
         </div>
       ) : (
